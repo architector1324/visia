@@ -8,7 +8,7 @@ import subprocess
 import pyperclipimg
 
 DEFAULT_MODEL = 'gemma3'
-DEFAULT_PATH = '/home/arch/AI/Projects/VisionAI/'
+SCREENSHOT_PATH = '/tmp/visia.png'
 
 MODELS = [
     'gemma3',
@@ -24,10 +24,10 @@ def get_image(clip, area):
             if not image:
                 return None
         else:
-            command = ['gnome-screenshot', '-a' if area else '-w', '-p', '-f', f'{DEFAULT_PATH}/.tmp.png']
+            command = ['gnome-screenshot', '-a' if area else '-w', '-p', '-f', SCREENSHOT_PATH]
             subprocess.run(command, check=True)
 
-            image = PIL.Image.open(f'{DEFAULT_PATH}/.tmp.png')
+            image = PIL.Image.open(SCREENSHOT_PATH)
 
         buffered = io.BytesIO()
         image.save(buffered, format='PNG')
@@ -48,7 +48,7 @@ def prompt_window():
         command = [
             'zenity',
             '--entry',
-            '--title=Vision AI',
+            '--title=VisIA',
             '--text=Prompt'
         ]
 
@@ -70,7 +70,7 @@ def model_window():
         command = [
             'zenity',
             '--list',
-            '--title=Vision AI',
+            '--title=VisIA',
             '--text=Choose model',
             '--column=Models',
         ]
@@ -98,7 +98,7 @@ def output_window(text):
         command = [
             'zenity',
             '--info',
-            '--title=Vision AI',
+            '--title=VisIA',
             f'--text={text}'
         ]
         subprocess.run(command, check=True)
@@ -110,7 +110,7 @@ def output_window(text):
 # main
 if __name__ == '__main__':
     # parse arguments
-    parser = argparse.ArgumentParser(description='Vision AI')
+    parser = argparse.ArgumentParser(description='VisIA')
     subparsers = parser.add_subparsers(dest='command', help='Commands')
 
     # cli
