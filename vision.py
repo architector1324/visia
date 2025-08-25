@@ -1,6 +1,3 @@
-#!/bin/bash
-"exec" "/home/arch/AI/Projects/VisionAI/venv/bin/python" "$0" "$@"
-
 import io
 import PIL
 import base64
@@ -115,7 +112,7 @@ if __name__ == '__main__':
     # parse arguments
     parser = argparse.ArgumentParser(description='Vision AI')
     subparsers = parser.add_subparsers(dest='command', help='Commands')
-    
+
     # cli
     cli_parser = subparsers.add_parser('cli', help='CLI mode')
     cli_parser.add_argument('-m', '--model', default=DEFAULT_MODEL, type=str, help='LLM model')
