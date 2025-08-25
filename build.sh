@@ -8,9 +8,9 @@ source ./build/venv/bin/activate
 pip install --upgrade pip
 pip install pillow ollama pyperclip pyperclipimg pyinstaller
 
-cp ./vision.py -t build/
+cp ./visia.py -t build/
 cd build
 
-pyinstaller --onefile vision.py
+pyinstaller --onefile visia.py
 
-mv dist/vision ../vision
+mv dist/visia ../visia
