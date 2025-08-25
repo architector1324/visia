@@ -13,6 +13,13 @@ import pyperclipimg
 DEFAULT_MODEL = 'gemma3'
 DEFAULT_PATH = '/home/arch/AI/Projects/VisionAI/'
 
+MODELS = [
+    'gemma3',
+    'gemma3:12b',
+    'qwen2.5vl',
+    'qwen2.5vl:3b'
+]
+
 def get_image(clip, area):
     try:
         if clip:
@@ -26,7 +33,7 @@ def get_image(clip, area):
             image = PIL.Image.open(f'{DEFAULT_PATH}/.tmp.png')
 
         buffered = io.BytesIO()
-        image.save(buffered, format="PNG")
+        image.save(buffered, format='PNG')
         
         img_bytes = buffered.getvalue()
         img = base64.b64encode(img_bytes).decode('utf-8')
@@ -35,7 +42,7 @@ def get_image(clip, area):
         return img
 
     except Exception as e:
-        print(f"Произошла ошибка: {e}")
+        print(f'Произошла ошибка: {e}')
         return None
 
 
@@ -45,7 +52,7 @@ def prompt_window():
             'zenity',
             '--entry',
             '--title=Vision AI',
-            '--text=Prompt:'
+            '--text=Prompt'
         ]
 
         result = subprocess.run(
@@ -57,7 +64,31 @@ def prompt_window():
         return result.stdout.strip()
 
     except Exception as e:
-        print(f"Произошла ошибка: {e}")
+        print(f'Произошла ошибка: {e}')
+        return None
+
+
+def model_window():
+    try:
+        command = [
+            'zenity',
+            '--list',
+            '--title=Vision AI',
+            '--text=Choose model',
+            '--column=Models',
+        ]
+        command.extend(MODELS)
+
+        result = subprocess.run(
+            command,
+            capture_output=True,
+            text=True,  # Декодировать вывод в строку
+            check=True  # Генерировать исключение, если zenity вернет ошибку
+        )
+        return result.stdout.strip()
+
+    except Exception as e:
+        print(f'Произошла ошибка: {e}')
         return None
 
 
@@ -75,7 +106,7 @@ def output_window(text):
         ]
         subprocess.run(command, check=True)
     except Exception as e:
-        print(f"Произошла ошибка: {e}")
+        print(f'Произошла ошибка: {e}')
         return None
 
 
@@ -89,6 +120,7 @@ if __name__ == '__main__':
     parser.add_argument('-c', '--clip', action='store_true', help='Use clipboard instead screenshot')
     parser.add_argument('-w', '--win', action='store_true', help='Show prompt window')
     parser.add_argument('--area', action='store_true', help='Area screenshot')
+    parser.add_argument('--choose', action='store_true', help='Show models window')
     parser.add_argument('-p', '--prompt', type=str, help='Prompt')
 
     args = parser.parse_args()
@@ -96,16 +128,18 @@ if __name__ == '__main__':
     # get image
     image = get_image(args.clip, args.area)
     if not image:
-        print("Нет изображения.")
+        print('Нет изображения.')
         exit(0)
 
     # generate
+    model = model_window() if args.choose else args.model
     prompt = prompt_window() if args.win else args.prompt
+
     llm = ollama.Client(host=args.address)
 
     if not args.stream:
         answer = llm.generate(
-            model=args.model,
+            model=model,
             prompt=prompt,
             stream=args.stream,
             images=[image],
@@ -119,7 +153,7 @@ if __name__ == '__main__':
 
     else:
         text_s = llm.generate(
-            model=args.model,
+            model=model,
             prompt=prompt,
             stream=args.stream,
             images=[image],
