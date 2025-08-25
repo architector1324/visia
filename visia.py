@@ -110,7 +110,7 @@ def output_window(text):
 # main
 if __name__ == '__main__':
     # parse arguments
-    parser = argparse.ArgumentParser(description='VisIA')
+    parser = argparse.ArgumentParser(description='Visual Instant Ai')
     subparsers = parser.add_subparsers(dest='command', help='Commands')
 
     # cli

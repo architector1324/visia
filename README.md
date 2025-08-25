@@ -1,6 +1,9 @@
 # VisIA: Visual Instant Ai
 
-VisIA is a lightweight and powerful tool for instant interaction with visual content on your desktop using local artificial intelligence models. Designed for rapid integration into Linux users' workflows, VisIA allows you to instantly capture images and send them to Ollama for analysis, receiving responses directly on your screen.
+![](./demo0.png)
+![](./demo1.png)
+
+**VisIA** is a lightweight and powerful tool for instant interaction with visual content on your desktop using local artificial intelligence models. Designed for rapid integration into Linux users' workflows, VisIA allows you to instantly capture images and send them to Ollama for analysis, receiving responses directly on your screen.
 
 ## Features
 
