@@ -114,14 +114,23 @@ def output_window(text):
 if __name__ == '__main__':
     # parse arguments
     parser = argparse.ArgumentParser(description='Vision AI')
-    parser.add_argument('-m', '--model', default=DEFAULT_MODEL, type=str, help='LLM model')
-    parser.add_argument('-s', '--stream', action='store_true', default=False, help='Stream output')
-    parser.add_argument('-a', '--address', default='0.0.0.0:11434', type=str, help='Server host address')
-    parser.add_argument('-c', '--clip', action='store_true', help='Use clipboard instead screenshot')
-    parser.add_argument('-w', '--win', action='store_true', help='Show prompt window')
-    parser.add_argument('--area', action='store_true', help='Area screenshot')
-    parser.add_argument('--choose', action='store_true', help='Show models window')
-    parser.add_argument('-p', '--prompt', type=str, help='Prompt')
+    subparsers = parser.add_subparsers(dest='command', help='Commands')
+    
+    # cli
+    cli_parser = subparsers.add_parser('cli', help='CLI mode')
+    cli_parser.add_argument('-m', '--model', default=DEFAULT_MODEL, type=str, help='LLM model')
+    cli_parser.add_argument('-s', '--stream', action='store_true', default=False, help='Stream output')
+    cli_parser.add_argument('-a', '--address', default='0.0.0.0:11434', type=str, help='Server host address')
+    cli_parser.add_argument('-c', '--clip', action='store_true', help='Use clipboard instead screenshot')
+    cli_parser.add_argument('--area', action='store_true', help='Area screenshot')
+    cli_parser.add_argument('prompt', nargs='+', type=str, help='Prompt for model')
+
+    # gui
+    gui_parser = subparsers.add_parser('gui', help='GUI mode')
+    gui_parser.add_argument('-a', '--address', default='0.0.0.0:11434', type=str, help='Server host address')
+    gui_parser.add_argument('-c', '--clip', action='store_true', help='Use clipboard instead screenshot')
+    gui_parser.add_argument('--area', action='store_true', help='Area screenshot')
+    gui_parser.add_argument('--choose', action='store_true', help='Show models window')
 
     args = parser.parse_args()
 
@@ -131,31 +140,41 @@ if __name__ == '__main__':
         print('Нет изображения.')
         exit(0)
 
-    # generate
-    model = model_window() if args.choose else args.model
-    prompt = prompt_window() if args.win else args.prompt
+    # get prompt and model
+    if args.command == 'cli':
+        model = args.model
+        prompt = ' '.join(args.prompt).strip()
+        stream = args.stream
+    elif args.command == 'gui':
+        model = model_window() if args.choose else DEFAULT_MODEL
+        prompt = prompt_window()
+        stream = False
+    else:
+        parser.print_help()
+        exit()
 
+    # generate
     llm = ollama.Client(host=args.address)
 
-    if not args.stream:
+    if not stream:
         answer = llm.generate(
             model=model,
             prompt=prompt,
-            stream=args.stream,
+            stream=stream,
             images=[image],
             keep_alive=0,
             # options={'num_ctx': 8192}
         )['response'].strip()
         print(answer)
 
-        if args.win:
+        if args.command == 'gui':
             output_window(answer)
 
     else:
         text_s = llm.generate(
             model=model,
             prompt=prompt,
-            stream=args.stream,
+            stream=stream,
             images=[image],
             keep_alive=0,
             # options={'num_ctx': 8192}
